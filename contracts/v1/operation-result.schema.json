@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forge.spark89.local/contracts/v1/operation-result.schema.json",
+  "title": "Forge operation result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract_version", "request_id", "run_id", "module_id", "module_version", "operation_id", "status", "started_at", "completed_at", "outputs", "evidence", "omissions", "errors"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "contract_version": { "$ref": "common.schema.json#/$defs/semver" },
+    "request_id": { "$ref": "common.schema.json#/$defs/identifier" },
+    "run_id": { "$ref": "common.schema.json#/$defs/identifier" },
+    "module_id": { "$ref": "common.schema.json#/$defs/identifier" },
+    "module_version": { "$ref": "common.schema.json#/$defs/semver" },
+    "operation_id": { "$ref": "common.schema.json#/$defs/identifier" },
+    "status": { "enum": ["succeeded", "failed", "cancelled", "setup_required", "review_required"] },
+    "started_at": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "completed_at": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "outputs": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/artifact" } },
+    "evidence": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/evidence_reference" } },
+    "omissions": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/omission" } },
+    "errors": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/error" } },
+    "metrics": { "type": "object", "additionalProperties": { "type": ["number", "integer", "string", "boolean"] } }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "status": { "const": "succeeded" } },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": { "errors": { "maxItems": 0 } },
+        "not": {
+          "properties": {
+            "outputs": { "maxItems": 0 },
+            "evidence": { "maxItems": 0 }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "status": { "enum": ["failed", "setup_required"] } },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": { "errors": { "minItems": 1 } }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "omissions": {
+            "contains": {
+              "properties": { "impact": { "const": "verification_blocking" } },
+              "required": ["impact"]
+            }
+          }
+        },
+        "required": ["omissions"]
+      },
+      "then": {
+        "properties": { "status": { "not": { "const": "succeeded" } } }
+      }
+    }
+  ]
+}

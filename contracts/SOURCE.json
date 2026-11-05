@@ -1,0 +1,23 @@
+{
+  "source": "forge contracts/v1",
+  "forge_repository": "git@github.com:brighton-agency-inc/spark89-forge.git",
+  "forge_contract_revision": "a701e8111f488299e1ab7a0c353ee6718be3a0a4",
+  "contracts": {
+    "flow-document": "1.0.0",
+    "flow-change-proposal": "1.0.0",
+    "operation-request": "1.0.0",
+    "operation-result": "1.0.0",
+    "health-result": "1.0.0",
+    "module-manifest": "1.0.0 and 1.1.0"
+  },
+  "note": "Byte-identical copies of the Forge shared contracts. The module consumes them and does not edit them. Update by copying from an accepted Forge revision and recording its identity here.",
+  "files": {
+    "common.schema.json": "sha256:3974b39103c21f0e8cf5be5696093ad4ccae8de8e1b2c53c0af2751a24e0af79",
+    "flow-change-proposal.schema.json": "sha256:25f86069e3670480e10fc9d852b8097326ddcb86f387e0f4925d754c94396c38",
+    "flow-document.schema.json": "sha256:9bce0ba157b0631f3d25bb8a305b79baf281412456c345e8b1703ca5bfc8f4e3",
+    "health-result.schema.json": "sha256:a213904305d612791c2ddc7e30849da0f86847b58fe70fdcf988e9256789941c",
+    "module-manifest.schema.json": "sha256:59797ebbc652ff43302f12ed8eff30e0340d936567674fc0be54587413fbdddf",
+    "operation-request.schema.json": "sha256:055cb892fa912f029af6b6a3806027e2e3192ed6da7521a110c076975e0faacb",
+    "operation-result.schema.json": "sha256:6bc6bd3111673294b4ce3859f12ae6caa8d743f0989745683da7c8bc94161ab2"
+  }
+}

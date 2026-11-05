@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forge.spark89.local/contracts/v1/flow-change-proposal.schema.json",
+  "title": "Forge flow change proposal",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract_version", "proposal_id", "document_id", "base_revision", "created_at", "status", "summary", "changes", "validation"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "contract_version": { "const": "1.0.0" },
+    "proposal_id": { "$ref": "common.schema.json#/$defs/identifier" },
+    "document_id": { "$ref": "common.schema.json#/$defs/identifier" },
+    "base_revision": { "type": "integer", "minimum": 1 },
+    "created_at": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "status": { "enum": ["proposed", "accepted", "rejected"] },
+    "summary": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "changes": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["change_id", "type"],
+        "properties": {
+          "change_id": { "$ref": "common.schema.json#/$defs/identifier" },
+          "type": { "enum": ["add-node", "update-node", "remove-node", "add-connection", "update-connection", "remove-connection", "update-document", "update-lifecycle", "relayout"] },
+          "node": { "$ref": "flow-document.schema.json#/properties/nodes/items" },
+          "node_id": { "$ref": "common.schema.json#/$defs/identifier" },
+          "node_patch": { "type": "object", "additionalProperties": false, "minProperties": 1, "properties": { "kind": { "enum": ["start", "end", "action", "decision", "approval", "document", "system"] }, "label": { "type": "string", "minLength": 1, "maxLength": 500 }, "description": { "type": "string", "maxLength": 4000 }, "lane_id": { "$ref": "common.schema.json#/$defs/identifier" }, "role": { "type": "string", "minLength": 1, "maxLength": 200 }, "system": { "type": "string", "minLength": 1, "maxLength": 200 } } },
+          "connection": { "$ref": "flow-document.schema.json#/properties/connections/items" },
+          "connection_id": { "$ref": "common.schema.json#/$defs/identifier" },
+          "connection_patch": { "type": "object", "additionalProperties": false, "minProperties": 1, "properties": { "from_node": { "$ref": "common.schema.json#/$defs/identifier" }, "to_node": { "$ref": "common.schema.json#/$defs/identifier" }, "label": { "type": "string", "minLength": 1, "maxLength": 200 }, "condition": { "type": "string", "minLength": 1, "maxLength": 500 } } },
+          "document": { "type": "object", "additionalProperties": false, "minProperties": 1, "properties": { "title": { "type": "string", "minLength": 1, "maxLength": 200 }, "description": { "type": "string", "maxLength": 4000 } } },
+          "lifecycle_state": { "enum": ["active", "archived"] },
+          "layout_direction": { "enum": ["top-down", "left-right"] }
+        },
+        "allOf": [
+          { "if": { "properties": { "type": { "const": "add-node" } }, "required": ["type"] }, "then": { "required": ["node"] } },
+          { "if": { "properties": { "type": { "const": "update-node" } }, "required": ["type"] }, "then": { "required": ["node_id", "node_patch"] } },
+          { "if": { "properties": { "type": { "const": "remove-node" } }, "required": ["type"] }, "then": { "required": ["node_id"] } },
+          { "if": { "properties": { "type": { "const": "add-connection" } }, "required": ["type"] }, "then": { "required": ["connection"] } },
+          { "if": { "properties": { "type": { "const": "update-connection" } }, "required": ["type"] }, "then": { "required": ["connection_id", "connection_patch"] } },
+          { "if": { "properties": { "type": { "const": "remove-connection" } }, "required": ["type"] }, "then": { "required": ["connection_id"] } },
+          { "if": { "properties": { "type": { "const": "update-document" } }, "required": ["type"] }, "then": { "required": ["document"] } },
+          { "if": { "properties": { "type": { "const": "update-lifecycle" } }, "required": ["type"] }, "then": { "required": ["lifecycle_state"] } },
+          { "if": { "properties": { "type": { "const": "relayout" } }, "required": ["type"] }, "then": { "required": ["layout_direction"] } }
+        ]
+      }
+    },
+    "validation": {
+      "type": "object", "additionalProperties": false, "required": ["valid", "errors", "warnings"],
+      "properties": {
+        "valid": { "type": "boolean" },
+        "errors": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "warnings": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    }
+  }
+}

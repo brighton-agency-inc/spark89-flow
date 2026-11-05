@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forge.spark89.local/contracts/v1/module-manifest.schema.json",
+  "title": "Forge module manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract_version", "module", "platforms", "media", "runtime", "operations", "health", "connectors", "limitations"],
+  "properties": {
+    "schema_version": { "enum": ["1.0.0", "1.1.0"] },
+    "contract_version": { "enum": ["1.0.0", "1.1.0"] },
+    "module": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "display_name", "version", "maturity", "description", "repository", "revision"],
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/identifier" },
+        "display_name": { "type": "string", "minLength": 1 },
+        "version": { "$ref": "common.schema.json#/$defs/semver" },
+        "maturity": { "$ref": "common.schema.json#/$defs/maturity" },
+        "description": { "type": "string", "minLength": 1 },
+        "repository": { "type": "string", "format": "uri" },
+        "revision": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+      }
+    },
+    "platforms": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "common.schema.json#/$defs/platform" }
+    },
+    "media": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["inputs", "outputs"],
+      "properties": {
+        "inputs": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1, "uniqueItems": true },
+        "outputs": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1, "uniqueItems": true }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "components", "resources"],
+      "properties": {
+        "strategy": { "enum": ["bundled", "forge_managed", "hybrid"] },
+        "interpreters": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "common.schema.json#/$defs/interpreter" }
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "version", "source"],
+            "properties": {
+              "id": { "$ref": "common.schema.json#/$defs/identifier" },
+              "version": { "type": "string", "minLength": 1 },
+              "source": { "enum": ["bundle", "forge_runtime_store"] }
+            }
+          }
+        },
+        "resources": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["download_bytes", "installed_bytes", "memory_bytes"],
+          "properties": {
+            "download_bytes": { "type": "integer", "minimum": 0 },
+            "installed_bytes": { "type": "integer", "minimum": 0 },
+            "memory_bytes": { "type": "integer", "minimum": 0 },
+            "gpu_required": { "type": "boolean", "default": false }
+          }
+        }
+      }
+    },
+    "operations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "display_name", "description", "entrypoint", "input_contract", "output_contract", "timeout_seconds", "supports_cancellation", "permissions"],
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/identifier" },
+          "display_name": { "type": "string", "minLength": 1 },
+          "description": { "type": "string", "minLength": 1 },
+          "entrypoint": {
+            "anyOf": [
+              { "$ref": "common.schema.json#/$defs/entrypoint" },
+              { "$ref": "common.schema.json#/$defs/interpreter_entrypoint" }
+            ]
+          },
+          "input_contract": { "type": "string", "minLength": 1 },
+          "output_contract": { "type": "string", "minLength": 1 },
+          "timeout_seconds": { "type": "integer", "minimum": 1, "maximum": 86400 },
+          "supports_cancellation": { "type": "boolean" },
+          "permissions": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["network", "read_scopes", "write_scopes"],
+            "properties": {
+              "network": { "enum": ["none", "declared_hosts"] },
+              "network_hosts": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+              "read_scopes": { "type": "array", "items": { "enum": ["declared_inputs", "module_runtime", "declared_references"] }, "uniqueItems": true },
+              "write_scopes": { "type": "array", "items": { "enum": ["declared_outputs", "module_cache", "temporary"] }, "uniqueItems": true }
+            },
+            "allOf": [
+              {
+                "if": { "properties": { "network": { "const": "declared_hosts" } }, "required": ["network"] },
+                "then": { "required": ["network_hosts"] }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "health": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entrypoint", "timeout_seconds"],
+      "properties": {
+        "entrypoint": {
+          "anyOf": [
+            { "$ref": "common.schema.json#/$defs/entrypoint" },
+            { "$ref": "common.schema.json#/$defs/interpreter_entrypoint" }
+          ]
+        },
+        "timeout_seconds": { "type": "integer", "minimum": 1, "maximum": 600 }
+      }
+    },
+    "required_companions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["module_id", "version_range", "purpose"],
+        "properties": {
+          "module_id": { "$ref": "common.schema.json#/$defs/identifier" },
+          "version_range": { "type": "string", "minLength": 1 },
+          "purpose": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "connectors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mcp", "skill_guidance"],
+      "properties": {
+        "mcp": { "type": "boolean" },
+        "skill_guidance": { "type": "boolean" }
+      }
+    },
+    "limitations": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/omission" } }
+  },
+  "allOf": [
+    {
+      "$comment": "Supported version pairs are schema_version/contract_version 1.0.0/1.0.0 and 1.1.0/1.1.0 (decision-log item 16); mixed pairs are rejected. The 1.1.0 pair requires the portable runtime declaration: runtime.interpreters and interpreter-form entry points. The 1.0.0 pair keeps executable-form entry points and no runtime.interpreters.",
+      "if": {
+        "properties": { "contract_version": { "const": "1.1.0" } },
+        "required": ["contract_version"]
+      },
+      "then": {
+        "properties": {
+          "schema_version": { "const": "1.1.0" },
+          "runtime": { "required": ["interpreters"] },
+          "operations": {
+            "items": {
+              "properties": { "entrypoint": { "$ref": "common.schema.json#/$defs/interpreter_entrypoint" } }
+            }
+          },
+          "health": {
+            "properties": { "entrypoint": { "$ref": "common.schema.json#/$defs/interpreter_entrypoint" } }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "schema_version": { "const": "1.0.0" },
+          "runtime": { "not": { "required": ["interpreters"] } },
+          "operations": {
+            "items": {
+              "properties": { "entrypoint": { "$ref": "common.schema.json#/$defs/entrypoint" } }
+            }
+          },
+          "health": {
+            "properties": { "entrypoint": { "$ref": "common.schema.json#/$defs/entrypoint" } }
+          }
+        }
+      }
+    }
+  ]
+}

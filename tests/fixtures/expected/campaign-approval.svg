@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1146" height="200" viewBox="0 0 1146 200" role="img" aria-labelledby="flow-title flow-desc" data-document-id="campaign-approval" data-document-revision="1" data-layout-source="computed" data-lanes="not-drawn">
+  <title id="flow-title">Campaign approval</title>
+  <desc id="flow-desc">Flow document campaign-approval, revision 1. Unverified diagram export. Lanes are not drawn.</desc>
+  <defs>
+    <marker id="arrow" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="10" refX="12" refY="5" orient="auto"><path d="M0,0 L12,5 L0,10 z" fill="#5b514b"/></marker>
+  </defs>
+  <style>text{font-family:system-ui,-apple-system,"Segoe UI",sans-serif}.node-label{fill:#342b27}.edge-label{fill:#342b27}</style>
+  <rect width="100%" height="100%" fill="#fffaf5"/>
+  <g class="edges" fill="none" stroke-linejoin="round" stroke-linecap="round">
+    <path id="edge-start-draft" data-from="start" data-to="draft" d="M 202 75 L 238 75 L 274 75" stroke="#5b514b" stroke-width="2" marker-end="url(#arrow)"/>
+    <path id="edge-draft-review" data-from="draft" data-to="review" d="M 422 75 L 458 75 L 494 75" stroke="#5b514b" stroke-width="2" marker-end="url(#arrow)"/>
+    <path id="edge-review-end" data-from="review" data-to="end" d="M 691.2 97.65 L 835 150 L 906 150" stroke="#5b514b" stroke-width="2" marker-end="url(#arrow)"/>
+    <path id="edge-review-revise" data-from="review" data-to="revise" d="M 764 75 L 835 75 L 938 60.61" stroke="#5b514b" stroke-width="2" marker-end="url(#arrow)"/>
+    <path id="edge-revise-review" data-from="revise" data-to="review" d="M 938 41.72 L 835 30.5 L 708.68 57.79" stroke="#5b514b" stroke-width="2" marker-end="url(#arrow)"/>
+  </g>
+  <g class="edge-labels">
+    <g data-connection="review-end"><title>Approved</title><rect x="800" y="139" width="70" height="22" rx="4" fill="#fffaf5" fill-opacity="0.92"/><text class="edge-label" text-anchor="middle" dominant-baseline="central" font-size="12"><tspan x="835" y="150">Approved</tspan></text></g>
+    <g data-connection="review-revise"><title>Rejected</title><rect x="801" y="64" width="68" height="22" rx="4" fill="#fffaf5" fill-opacity="0.92"/><text class="edge-label" text-anchor="middle" dominant-baseline="central" font-size="12"><tspan x="835" y="75">Rejected</tspan></text></g>
+  </g>
+  <g class="nodes">
+    <g id="node-start" data-kind="start"><title>Brief received</title><ellipse cx="113" cy="75" rx="89" ry="26" fill="#f4ede6" stroke="#c84f1d" stroke-width="2"/><text class="node-label" text-anchor="middle" dominant-baseline="central" font-size="14"><tspan x="113" y="75">Brief received</tspan></text></g>
+    <g id="node-draft" data-kind="action"><title>Draft creative</title><rect x="274" y="49" width="148" height="52" rx="8" fill="#ffffff" stroke="#c84f1d" stroke-width="2"/><text class="node-label" text-anchor="middle" dominant-baseline="central" font-size="14"><tspan x="348" y="75">Draft creative</tspan></text></g>
+    <g id="node-review" data-kind="decision"><title>Brand approved?</title><polygon points="629,33 764,75 629,117 494,75" fill="#fff1d6" stroke="#c84f1d" stroke-width="2"/><text class="node-label" text-anchor="middle" dominant-baseline="central" font-size="14"><tspan x="629" y="75">Brand approved?</tspan></text></g>
+    <g id="node-revise" data-kind="action"><title>Revise creative</title><rect x="938" y="24" width="152" height="52" rx="8" fill="#ffffff" stroke="#c84f1d" stroke-width="2"/><text class="node-label" text-anchor="middle" dominant-baseline="central" font-size="14"><tspan x="1014" y="50">Revise creative</tspan></text></g>
+    <g id="node-end" data-kind="end"><title>Creative approved</title><ellipse cx="1014" cy="150" rx="108" ry="26" fill="#f4ede6" stroke="#c84f1d" stroke-width="2"/><text class="node-label" text-anchor="middle" dominant-baseline="central" font-size="14"><tspan x="1014" y="150">Creative approved</tspan></text></g>
+  </g>
+</svg>

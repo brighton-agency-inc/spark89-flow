@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0.0", "contract_version": "1.0.0", "document_id": "campaign-approval", "revision": 2,
+  "title": "Campaign approval", "description": "Draft, brand review and legal approval.",
+  "lifecycle": { "state": "active" }, "created_at": "2026-11-04T14:00:00Z", "updated_at": "2026-11-04T14:11:00Z",
+  "provenance": { "operation": "apply-flow-change", "producer": "forge-flow" },
+  "nodes": [
+    { "node_id": "start", "kind": "start", "label": "Brief received" },
+    { "node_id": "review", "kind": "decision", "label": "Brand approved?" },
+    { "node_id": "revise", "kind": "action", "label": "Revise creative" },
+    { "node_id": "legal", "kind": "approval", "label": "Legal review" },
+    { "node_id": "end", "kind": "end", "label": "Creative approved" }
+  ],
+  "connections": [
+    { "connection_id": "start-review", "from_node": "start", "to_node": "review" },
+    { "connection_id": "review-legal", "from_node": "review", "to_node": "legal", "label": "Approved" },
+    { "connection_id": "review-revise", "from_node": "review", "to_node": "revise", "label": "Rejected" },
+    { "connection_id": "revise-review", "from_node": "revise", "to_node": "review" },
+    { "connection_id": "legal-end", "from_node": "legal", "to_node": "end" }
+  ],
+  "lanes": [], "layout": { "direction": "left-right" }
+}

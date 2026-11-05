@@ -1,0 +1,22 @@
+{
+  "name": "flow-document",
+  "version": "0.1.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "description": "Forge flow-document module: validates, applies, lays out and exports flow documents.",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/brighton-agency-inc/spark89-flow.git"
+  },
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "test": "node --test \"tests/**/*.test.js\""
+  },
+  "dependencies": {
+    "@dagrejs/dagre": "3.1.3",
+    "ajv": "8.17.1",
+    "ajv-formats": "3.0.1"
+  }
+}

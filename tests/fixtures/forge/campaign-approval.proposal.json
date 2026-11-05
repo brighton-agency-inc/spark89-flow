@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0.0",
+  "contract_version": "1.0.0",
+  "proposal_id": "add-legal-review",
+  "document_id": "campaign-approval",
+  "base_revision": 1,
+  "created_at": "2026-11-04T14:10:00Z",
+  "status": "proposed",
+  "summary": "Add legal approval before completion.",
+  "changes": [
+    { "change_id": "add-legal-node", "type": "add-node", "node": { "node_id": "legal", "kind": "approval", "label": "Legal review", "role": "Legal" } },
+    { "change_id": "remove-direct-end", "type": "remove-connection", "connection_id": "review-end" },
+    { "change_id": "connect-brand-legal", "type": "add-connection", "connection": { "connection_id": "review-legal", "from_node": "review", "to_node": "legal", "label": "Approved" } },
+    { "change_id": "connect-legal-end", "type": "add-connection", "connection": { "connection_id": "legal-end", "from_node": "legal", "to_node": "end" } }
+  ],
+  "validation": { "valid": true, "errors": [], "warnings": [] }
+}

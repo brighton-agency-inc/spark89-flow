@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forge.spark89.local/contracts/v1/common.schema.json",
+  "title": "Forge common contract definitions",
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "maxLength": 128
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "detached_signature": {
+      "description": "Detached Ed25519 signature of a catalog or revocation list (contracts/signing.py): signed_sha256 is the digest of the record without its signature; value is standard base64 of the 64-byte signature over the same canonical payload.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "key_id", "signed_sha256", "value"],
+      "properties": {
+        "algorithm": { "enum": ["ed25519"] },
+        "key_id": { "$ref": "#/$defs/identifier" },
+        "signed_sha256": { "$ref": "#/$defs/sha256" },
+        "value": { "type": "string", "minLength": 1 }
+      }
+    },
+    "maturity": {
+      "enum": ["development", "internal_alpha", "installable", "workflow_qualified", "production_gating"]
+    },
+    "platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["os", "architecture"],
+      "properties": {
+        "os": { "enum": ["macos", "windows", "linux"] },
+        "architecture": { "enum": ["arm64", "x86_64"] },
+        "minimum_os_version": { "type": "string", "minLength": 1 },
+        "maximum_os_version": { "type": "string", "minLength": 1 }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_id", "role", "media_type", "location", "sha256", "size_bytes"],
+      "properties": {
+        "artifact_id": { "$ref": "#/$defs/identifier" },
+        "role": { "$ref": "#/$defs/identifier" },
+        "media_type": { "type": "string", "pattern": "^[a-z0-9.+-]+/[a-z0-9.+-]+$" },
+        "location": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "size_bytes": { "type": "integer", "minimum": 0 },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "locale": { "type": "string", "minLength": 2 }
+      }
+    },
+    "evidence_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_id", "evidence_type", "producer", "location", "sha256"],
+      "properties": {
+        "evidence_id": { "$ref": "#/$defs/identifier" },
+        "evidence_type": { "$ref": "#/$defs/identifier" },
+        "producer": { "$ref": "#/$defs/identifier" },
+        "contract_version": { "$ref": "#/$defs/semver" },
+        "location": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "retryable"],
+      "properties": {
+        "code": { "$ref": "#/$defs/identifier" },
+        "message": { "type": "string", "minLength": 1 },
+        "retryable": { "type": "boolean" },
+        "stage": { "$ref": "#/$defs/identifier" },
+        "details": { "type": "object" }
+      }
+    },
+    "omission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "description", "impact"],
+      "properties": {
+        "code": { "$ref": "#/$defs/identifier" },
+        "description": { "type": "string", "minLength": 1 },
+        "impact": { "enum": ["informational", "review_required", "verification_blocking"] }
+      }
+    },
+    "human_approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["approval_id", "role", "status"],
+      "properties": {
+        "approval_id": { "$ref": "#/$defs/identifier" },
+        "role": { "enum": ["creative", "copy", "legal", "traffic", "quality", "release"] },
+        "status": { "enum": ["not_required", "required", "pending", "approved", "rejected", "not_performed"] },
+        "actor_ref": { "type": "string", "minLength": 1 },
+        "decided_at": { "$ref": "#/$defs/timestamp" },
+        "notes": { "type": "string" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "enum": ["approved", "rejected"] } }, "required": ["status"] },
+          "then": { "required": ["actor_ref", "decided_at"] }
+        }
+      ]
+    },
+    "module_relative_path": {
+      "type": "string",
+      "minLength": 1,
+      "description": "A path relative to the installed module or bundle root that cannot escape that boundary. Rejects POSIX absolute paths (leading '/'), a leading single backslash, Windows drive-qualified paths ('C:\\' or 'C:/'), UNC paths ('\\\\host\\share' or '//host/share'), any '..' path segment in either separator style, and empty path segments (repeated or trailing separators).",
+      "pattern": "^(?!/)(?!\\\\)(?![A-Za-z]:[\\\\/])(?!\\\\\\\\)(?!//)(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$))(?!.*[\\\\/]{2,})(?!.*[\\\\/]$).+$"
+    },
+    "entrypoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["executable", "arguments"],
+      "properties": {
+        "executable": { "$ref": "#/$defs/module_relative_path" },
+        "arguments": { "type": "array", "items": { "type": "string" }, "maxItems": 64 },
+        "working_directory": { "$ref": "#/$defs/module_relative_path" }
+      }
+    },
+    "portable_module_path": {
+      "description": "A module-relative path that is portable across machines (contract 1.1.0). In addition to every module_relative_path rule, it uses '/' separators only and rejects '~', '$' expansions, and any path segment naming an installed environment location ('.venv', 'venv', 'node_modules', 'site-packages', compared case-insensitively). Installed environments are machine-local state and are never part of a module manifest.",
+      "allOf": [
+        { "$ref": "#/$defs/module_relative_path" },
+        {
+          "type": "string",
+          "pattern": "^(?!(?:.*/)?(?:\\.[Vv][Ee][Nn][Vv]|[Vv][Ee][Nn][Vv]|[Nn][Oo][Dd][Ee]_[Mm][Oo][Dd][Uu][Ll][Ee][Ss]|[Ss][Ii][Tt][Ee]-[Pp][Aa][Cc][Kk][Aa][Gg][Ee][Ss])(?:/|$))[^\\\\~$]+$"
+        }
+      ]
+    },
+    "version_constraint": {
+      "description": "Restricted comparator grammar: one or more comma-separated clauses of '>=', '<=', '>', '<' or '==' followed by a numeric version N, N.N or N.N.N, with no whitespace. Examples: '>=3.12,<3.15', '>=18'.",
+      "type": "string",
+      "pattern": "^(?:>=|<=|==|>|<)(?:0|[1-9][0-9]*)(?:\\.(?:0|[1-9][0-9]*)){0,2}(?:,(?:>=|<=|==|>|<)(?:0|[1-9][0-9]*)(?:\\.(?:0|[1-9][0-9]*)){0,2})*$"
+    },
+    "interpreter": {
+      "description": "A language runtime the module needs. Forge selects a concrete interpreter satisfying version_constraint at install time; the selection is installed state, never manifest content.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "version_constraint"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "kind": { "enum": ["python", "node"] },
+        "version_constraint": { "$ref": "#/$defs/version_constraint" },
+        "dependency_manifest": { "$ref": "#/$defs/portable_module_path" },
+        "dependency_lock": { "$ref": "#/$defs/portable_module_path" }
+      }
+    },
+    "interpreter_entrypoint": {
+      "description": "Contract 1.1.0 entry point: a module-relative script run by a declared runtime interpreter. There is no executable path; Forge supplies the interpreter it selected for the referenced interpreter id.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["interpreter", "script", "arguments", "working_directory"],
+      "properties": {
+        "interpreter": { "$ref": "#/$defs/identifier" },
+        "script": { "$ref": "#/$defs/portable_module_path" },
+        "arguments": { "type": "array", "items": { "type": "string" }, "maxItems": 64 },
+        "working_directory": { "$ref": "#/$defs/portable_module_path" }
+      }
+    }
+  }
+}

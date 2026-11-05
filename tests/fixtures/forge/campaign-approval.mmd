@@ -1,0 +1,11 @@
+flowchart LR
+  n_7374617274["Brief received"]
+  n_6472616674["Draft creative"]
+  n_726576696577{"Brand approved?"}
+  n_726576697365["Revise creative"]
+  n_656e64["Creative approved"]
+  n_7374617274 --> n_6472616674
+  n_6472616674 --> n_726576696577
+  n_726576696577 -->|Approved| n_656e64
+  n_726576696577 -->|Rejected| n_726576697365
+  n_726576697365 --> n_726576696577
